@@ -3,10 +3,12 @@ import random
 import sys
 import time
 import pygame as pg
+import math
 
 
 WIDTH = 1600  # ゲームウィンドウの幅
 HEIGHT = 900  # ゲームウィンドウの高さ
+NUM_OF_BOMBS = 5
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -52,6 +54,7 @@ class Bird:
         こうかとん画像Surfaceを生成する
         引数 xy：こうかとん画像の初期位置座標タプル
         """
+        self.dire=(+5, 0)
         self.img = __class__.imgs[(+5, 0)]
         self.rct: pg.Rect = self.img.get_rect()
         self.rct.center = xy
@@ -76,6 +79,8 @@ class Bird:
             if key_lst[k]:
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
+                if not sum_mv == [0, 0]:
+                    self.dire = sum_mv
         self.rct.move_ip(sum_mv)
         if check_bound(self.rct) != (True, True):
             self.rct.move_ip(-sum_mv[0], -sum_mv[1])
@@ -117,12 +122,14 @@ class Bomb:
 
 class Beam:
     def __init__(self, bird:Bird):
-        self.img = pg.transform.rotozoom(pg.image.load("fig/beam.png"), 0, 2.0)
+        vx, vy = bird.dire[0], bird.dire[1]
+        angle = math.atan2(-vy, vx)
+        self.img = pg.transform.rotozoom(pg.image.load("fig/beam.png"), math.degrees(angle), 2.0)
         self.rct : pg.Rect = self.img.get_rect()
         self.rct.left = bird.rct.right
         self.rct.centery = bird.rct.centery
         self.vx, self.vy = +5, 0
-
+ 
 
     def update(self, screen: pg.Surface):
         if check_bound(self.rct) == (True, True):
@@ -131,12 +138,13 @@ class Beam:
 
 
 
+
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((900, 400))
-    bomb = Bomb((255, 0, 0), 10)
+    bombs = [Bomb((255, 0, 0), 10) for i in range(NUM_OF_BOMBS)]
     beam = None
     clock = pg.time.Clock()
     tmr = 0
@@ -147,24 +155,26 @@ def main():
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beam = Beam(bird)
         screen.blit(bg_img, [0, 0])
-        if not (bird is None or bomb is None):
+
+        for bomb in bombs:
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
                 bird.change_img(8, screen)
                 pg.display.update()
                 time.sleep(1)
                 return
-        
-        if not (beam is None or bomb is None):
-            if beam.rct.colliderect(bomb.rct):
-                beam = None
-                bomb = None
-                bird.change_img(6, screen)
-                pg.display.update()
+        for i, bomb in enumerate(bombs):
+            if beam is not None:
+                if beam.rct.colliderect(bomb.rct):
+                    beam = None
+                    bombs[i] = None
+                    bird.change_img(6, screen)
+                    pg.display.update()
+        bombs = [bomb for bomb in bombs if bomb is not None]
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
-        if bomb is not None:
+        for bomb in bombs:
             bomb.update(screen)
         if beam is not None:
             beam.update(screen)
