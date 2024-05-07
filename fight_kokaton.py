@@ -121,6 +121,7 @@ class Bomb:
 
 
 class Beam:
+    "ビームに関するクラス"
     def __init__(self, bird:Bird):
         vx, vy = bird.dire[0], bird.dire[1]
         angle = math.atan2(-vy, vx)
@@ -138,6 +139,7 @@ class Beam:
 
 
 class Score:
+    "スコアを表示するクラス"
     def __init__(self):
         self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
         self.c = (0, 0, 255)
