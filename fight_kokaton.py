@@ -151,11 +151,14 @@ class Score:
         self.img = self.fonto.render(f"スコア：{self.sco}", 0, self.c)
         screen.blit(self.img, self.sp)
 
+    
+
 
 
 
 
 def main():
+    mt = []
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
     bg_img = pg.image.load("fig/pg_bg.jpg")
@@ -171,6 +174,7 @@ def main():
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beam = Beam(bird)
+                mt.append(beam)
         screen.blit(bg_img, [0, 0])
 
         for bomb in bombs:
@@ -189,6 +193,7 @@ def main():
                     pg.display.update()
                     score.sco +=1
         bombs = [bomb for bomb in bombs if bomb is not None]
+
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
