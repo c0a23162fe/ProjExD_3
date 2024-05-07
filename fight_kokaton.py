@@ -12,7 +12,6 @@ HEIGHT = 900  # ゲームウィンドウの高さ
 NUM_OF_BOMBS = 5
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-
 def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     """
     オブジェクトが画面内or画面外を判定し，真理値タプルを返す関数
@@ -137,6 +136,7 @@ class Beam:
             self.rct.move_ip(self.vx, self.vy)
             screen.blit(self.img, self.rct)
 
+
 class Score:
     def __init__(self):
         self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
@@ -150,10 +150,6 @@ class Score:
     def update(self, screen):
         self.img = self.fonto.render(f"スコア：{self.sco}", 0, self.c)
         screen.blit(self.img, self.sp)
-
-
-
-
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
